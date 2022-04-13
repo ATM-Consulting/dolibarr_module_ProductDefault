@@ -708,7 +708,6 @@ if ( is_array( $productDefault->lines) && !empty($productDefault->lines)) {
 	//$action, $line, $var, $num, $i, $dateSelector, $seller, $buyer, $selected = 0
 	$productDefault->printObjectLines($action, $object,$object,$selected);
 }
-
 $conf->modules_parts['tpl'] = array();
 
 // pour eviter les collison de nom de champs dans le form
