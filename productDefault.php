@@ -96,11 +96,13 @@ $optioncss 		= GETPOST('optioncss', 'aZ'); // Option for the css output (always 
 $selected 		= GETPOST('lineid', 'int'); // Option for the css output (always '' except when 'print')
 $rank 			= (GETPOST('rank', 'int') > 0) ? GETPOST('rank', 'int') : -1;
 $id 			= GETPOST('id', 'int');
-
-
+$lineid  		= GETPOST('lineid', 'int');
+var_dump($_POST);
 $form = new Form($db);
 
-
+if (!empty($cancel) || empty($action)){
+	$lineid = 0;
+}
 
 $usercanread = $user->rights->productdefault->lire;
 $usercancreate = $user->rights->productdefault->creer;
@@ -108,6 +110,7 @@ $usercandelete = $user->rights->productdefault->supprimer;
 
 $object = new Societe($db);
 $object->fetch($id);
+$object->socid = $object->id;
 $extrafields = new ExtraFields($db);
 $productDefault = new ProductThirdpartyDefault($db);
 $formconfirm = "";
@@ -658,10 +661,7 @@ elseif ($action == 'updateline' && $usercancreate){
 /**
  * VIEW
  */
-//$object = new Propal($db);
-if ($data['idPropal'] > 0 ) {
-	$object->fetch($data['idPropal'] );
-}
+
 
 $morejs[] = '/custom/clieurochef/js/import.js';
 $acceptedEncodings = array('UTF-8', 'latin1', 'ISO-8859-1', 'ISO-8859-15', 'macintosh');
@@ -673,20 +673,10 @@ $linkback = '<a href="'.DOL_URL_ROOT.'/societe/list.php?restore_lastsearch_value
 dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', '');
 print "<hr>";
 
-
-
-
-
 $productDefault->lines = $productDefault->fetchAll("","",0,0,array('fk_soc' => $id));
-//var_dump($productDefault->lines);
-
-
-	// liste des products
-
-
 
 // insert product
-print '<table id="tablelines" class="noborder noshadow" width="100%">';
+
 print '	<form name="addproduct" id="addproduct" action="'.$_SERVER["PHP_SELF"].'?id='.$object->id.(($action != 'editline') ? '' : '#line_'.GETPOST('lineid', 'int')).'" method="POST">
 	<input type="hidden" name="token" value="' . newToken().'">
 	<input type="hidden" name="action" value="' . (($action != 'editline') ? 'addline' : 'updateline').'">
@@ -694,34 +684,168 @@ print '	<form name="addproduct" id="addproduct" action="'.$_SERVER["PHP_SELF"].'
 	<input type="hidden" name="page_y" value="">
 	<input type="hidden" name="id" value="' . $object->id.'">
 	';
+print '<table id="tablelines" class="noborder noshadow" width="100%">';
 
-if (!empty($conf->use_javascript_ajax)) {
-	include DOL_DOCUMENT_ROOT.'/core/tpl/ajaxrow.tpl.php';
-}
-if ( is_array( $productDefault->lines) && !empty($productDefault->lines)) {
-	$disableedit = 0;
-	$disablemove = 1;
-	$disableremove = 0;
+	// Instanciation du multiselect type
+	/*print '<div id="select_assignment">';
+	$typeByLine = getAssignmentLines($productDefault, $object);
+	// renseignement du multiSelectarray
+	print $form->multiselectarray('typeAssignment', $productDefault->Tassignment, $typeByLine['ids'][$lineid], null, null, null, null, "300px;");
+	print '</div>';*/
 
-	$productDefault->id = $object->id;
-	//var_dump($productDefault->id);
-	//$action, $line, $var, $num, $i, $dateSelector, $seller, $buyer, $selected = 0
-	$productDefault->printObjectLines($action, $object,$object,$selected);
-}
-$conf->modules_parts['tpl'] = array();
+	if (!empty($conf->use_javascript_ajax)) {
+		include DOL_DOCUMENT_ROOT.'/core/tpl/ajaxrow.tpl.php';
+	}
+	// ajout de la colonne assigment
+	printColAssignment($productDefault);
 
-// pour eviter les collison de nom de champs dans le form
-if ($action !== 'editline'){
-	$productDefault->formAddObjectLine(1, $object, $object);
-}
+	if ( is_array( $productDefault->lines) && !empty($productDefault->lines)) {
+		$disableedit = 0;
+		$disablemove = 1;
+		$disableremove = 0;
+
+		$productDefault->id = $object->id;
+		//var_dump($productDefault->id);
+		//$action, $line, $var, $num, $i, $dateSelector, $seller, $buyer, $selected = 0
+
+		$productDefault->printObjectLines($action, $object,$object,$selected);
+		// Affichage du multiselect user en mode vue et editline
+		$colspan_plus=1; // initialisation du nombre de td à ajouter dans les colspan
+
+		// Affichage des type assignment liés aux lignes
+		showAssignmentLine($productDefault, $object);
+	}
+
+	$conf->modules_parts['tpl'] = array();
+
+	if ($action !== 'editline'){
+		$productDefault->formAddObjectLine(1, $object, $object);
+	}
 
 
-print "</form>";
+	showMultiSelect($productDefault, $object, $form, $lineid);
+
 print "</table>";
+print "</form>";
+
 
 print $formconfirm;
 
 
 
+
+
+/**
+ * @return void
+ */
+function printColAssignment($productDefault) {
+
+	global $langs;
+
+	$langs->load('productdefault@productdefault');
+	?>
+
+	<script>
+		$(document).ready(function() {
+			console.log("col to add")
+			// Affichage du titre de la colonne
+			let title = <?php echo json_encode($langs->trans('Assignment')); ?>;
+			$('<td>'+title+'</td>').insertAfter($(".liste_titre").find(".linecoldescription"));
+
+
+			// Affichage du td des lignes
+			let cl = $("tr[id^='row-']").find(".linecoldescription");
+			console.log(cl);
+			$('<td class="content_line_Assignment"></td>').insertAfter(cl);
+
+			let Tassignment = <?php echo json_encode($productDefault->Tassignment); ?>;
+			console.log(Tassignment);
+			$('<td id="td_content_line_Assignment"></td>').insertAfter($("#tva_tx").parent('td').prev());
+			//$("#td_select_users_guests").append($("#select_users_guests"));
+
+		});
+
+	</script>
+
+	<?php
+
+}
+
+/**
+ * @param $productDefault
+ * @param $object
+ * @return void
+ */
+function showAssignmentLine($productDefault, $object){
+	global $db, $langs;
+	// Affichage des type assignment liés aux lignes
+	if(!empty($productDefault->lines)) {
+
+		$typeByLine =  getAssignmentLines($productDefault, $object)
+
+		?>
+		<script>
+			$(document).ready(function() {
+				let UsersByLine = <?php echo json_encode($typeByLine['types']); ?>;
+				"tr[id^='row-']"
+				$("#tablelines").find("tr[id^='row-']").each(function() {
+					//$("#tablelines").find(".linetr").each(function() {
+					if(typeof UsersByLine[$(this).data('id')] !== 'undefined');
+					$(this).find(".content_line_Assignment").append(UsersByLine[$(this).data('id')]);
+				});
+			});
+		</script>
+
+		<?php
+	}
+}
+/**
+ * @param $productDefault
+ * @param $object
+ * @return array
+ */
+function getAssignmentLines($productDefault, $object){
+
+	global $langs, $db;
+	// requete qui renvoie  toutes les lignes avec les types pour chaque ligne
+
+	// Instanciation d'un tableau de type d'assignation  associés aux lignes de productDefault de ce fk_soc
+	$sql  =" SELECT pa.fk_line_productdefault as id_line, pa.type_assignment as type from ".MAIN_DB_PREFIX."productdefault_productthirdpartydefault as pp ";
+	$sql .=" INNER JOIN ".MAIN_DB_PREFIX."productdefault_assignment pa ON (pp.rowid = pa.fk_line_productdefault)";
+	$sql .=" WHERE pp.fk_soc=".((int)$object->id);
+
+	$resql = $db->query($sql);
+	$typeByLine = array();
+	if ($resql) {
+		while ($ob = $db->fetch_object($resql)) {
+			$id_line = $ob->id_line;
+			$typeByLine['types'][$id_line] .=  $langs->trans($productDefault->Tassignment[$ob->type]) . '<br>';
+			$typeByLine['ids'][$id_line][] = $ob->type;
+		}
+	}
+	//var_dump($typeByLine);
+	return $typeByLine;
+
+}
+
+/**
+ * @param $productDefault
+ * @param $object
+ * @param $form
+ * @param $lineid
+ * @return void
+ */
+function showMultiSelect($productDefault, $object,&$form , $lineid){
+
+	$typeByLine = getAssignmentLines($productDefault, $object);
+	// renseignement du multiSelectarray
+	$multi = $form->multiselectarray('typeAssignment', $productDefault->Tassignment, $typeByLine['ids'][$lineid], null, null, null, null, "300px;");
+	?><script>
+		$(document).ready(function () {
+			let multi = <?php  echo json_encode($multi) ?>;
+			$("#td_content_line_Assignment").append(multi);
+		});
+	</script><?php
+}
 
 

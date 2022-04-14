@@ -64,10 +64,11 @@ class ProductThirdpartyDefault extends CommonObject
 	 */
 	public $picto = 'productthirdpartydefault@productdefault';
 
+	// type d'assignation de la ligne de produit
+	const TYPE_ASSIGNMENT_PROPOSAL = 1;
+	const TYPE_ASSIGNMENT_ORDER = 2;
 
-	/*const STATUS_DRAFT = 0;
-	const STATUS_VALIDATED = 1;
-	const STATUS_CANCELED = 9;*/
+	public $Tassignment = array();
 
 
 	/**
@@ -305,6 +306,10 @@ class ProductThirdpartyDefault extends CommonObject
 				}
 			}
 		}
+
+
+		$this->Tassignment[SELF::TYPE_ASSIGNMENT_PROPOSAL] = $langs->trans('TYPE_ASSIGNMENT_PROPOSAL_LANG');
+		$this->Tassignment[SELF::TYPE_ASSIGNMENT_ORDER] = $langs->trans('TYPE_ASSIGNMENT_ORDER_LANG');
 	}
 
 	/**
@@ -1170,10 +1175,11 @@ class ProductThirdpartyDefault extends CommonObject
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
 		$records = array();
-
-		$sql = 'SELECT ';
+		//p.ref p.label
+		$sql = 'SELECT  p.label, p.ref , ';
 		$sql .= $this->getFieldList('t');
 		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
+		$sql .= ' INNER JOIN '.MAIN_DB_PREFIX.'product'.' as p ON t.fk_product = p.rowid';
 		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) {
 			$sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
 		} else {
@@ -1217,6 +1223,10 @@ class ProductThirdpartyDefault extends CommonObject
 
 				$record = new self($this->db);
 				$record->setVarsFromFetchObj($obj);
+				// on ajoute les valeurs ajouter dans le fetch all
+				$record->ref = $obj->ref;
+				$record->label = $obj->label;
+				//$record->product_label = $obj->label;
 
 				$records[$record->id] = $record;
 
