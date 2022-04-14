@@ -442,7 +442,7 @@ class ProductThirdpartyDefault extends CommonObject
 	 *    	@return    	int         	    			>0 if OK, <0 if KO
 	 *    	@see       	add_product()
 	 */
-	public function addline($fk_soc,$desc, $pu_ht, $qty, $txtva, $txlocaltax1 = 0.0, $txlocaltax2 = 0.0, $fk_product = 0, $remise_percent = 0.0, $price_base_type = 'HT', $pu_ttc = 0.0, $info_bits = 0, $type = 0, $rang = -1, $special_code = 0, $fk_parent_line = 0, $fk_fournprice = 0, $pa_ht = 0, $label = '', $date_start = '', $date_end = '', $array_options = 0, $fk_unit = null, $origin = '', $origin_id = 0, $pu_ht_devise = 0, $fk_remise_except = 0)
+	public function addline($fk_soc, $typeAssignment, $desc, $pu_ht, $qty, $txtva, $txlocaltax1 = 0.0, $txlocaltax2 = 0.0, $fk_product = 0, $remise_percent = 0.0, $price_base_type = 'HT', $pu_ttc = 0.0, $info_bits = 0, $type = 0, $rang = -1, $special_code = 0, $fk_parent_line = 0, $fk_fournprice = 0, $pa_ht = 0, $label = '', $date_start = '', $date_end = '', $array_options = 0, $fk_unit = null, $origin = '', $origin_id = 0, $pu_ht_devise = 0, $fk_remise_except = 0)
 	{
 		global $mysoc, $conf, $langs;
 
@@ -628,7 +628,22 @@ class ProductThirdpartyDefault extends CommonObject
 			}
 
 			$result = $this->line->insert();
-			if ($result > 0) {
+			$errors = 0;
+
+			// ajout des type d'assignation
+			foreach ($typeAssignment as $type){
+
+					$sql =  " INSERT INTO  " . MAIN_DB_PREFIX . "productdefault_assignment  (fk_line_productdefault, type_assignment) ";
+					$sql .= " VALUES ( " .(int) $this->line->id . "," . (int) $type . ")";
+					$resql = $this->db->query($sql);
+					if (!$resql){
+						$errors++;
+						break;
+					}
+			}
+
+
+			if ($result > 0  ) {
 				// Reorder if child line
 				if (!empty($fk_parent_line)) {
 					$this->line_order(true, 'DESC');
@@ -643,7 +658,7 @@ class ProductThirdpartyDefault extends CommonObject
 				// aucun total de document à mettre à jour pouisque nous ne sommes pas sur une propale ou commande
 				//$result = $this->update_price(1, 'auto', 0, $object); // This method is designed to add line from user input so total calculation must be done using 'auto' mode.
 
-				if ($result > 0) {
+				if ($result > 0 &&  $errors == 0) {
 					$this->db->commit();
 					return $this->line->id;
 				} else {
@@ -689,7 +704,7 @@ class ProductThirdpartyDefault extends CommonObject
 	 * 	@param		int			$notrigger			disable line update trigger
 	 *  @return     int     		        		0 if OK, <0 if KO
 	 */
-	public function updateline($rowid, $pu, $qty, $remise_percent, $txtva, $txlocaltax1 = 0.0, $txlocaltax2 = 0.0, $desc = '', $price_base_type = 'HT', $info_bits = 0, $special_code = 0, $fk_parent_line = 0, $skip_update_total = 0, $fk_fournprice = 0, $pa_ht = 0, $label = '', $type = 0, $date_start = '', $date_end = '', $array_options = 0, $fk_unit = null, $pu_ht_devise = 0, $notrigger = 0)
+	public function updateline($rowid, $typeAssignment, $pu, $qty, $remise_percent, $txtva, $txlocaltax1 = 0.0, $txlocaltax2 = 0.0, $desc = '', $price_base_type = 'HT', $info_bits = 0, $special_code = 0, $fk_parent_line = 0, $skip_update_total = 0, $fk_fournprice = 0, $pa_ht = 0, $label = '', $type = 0, $date_start = '', $date_end = '', $array_options = 0, $fk_unit = null, $pu_ht_devise = 0, $notrigger = 0)
 	{
 		global $mysoc, $langs, $user;
 
@@ -831,7 +846,28 @@ class ProductThirdpartyDefault extends CommonObject
 			$this->line->multicurrency_total_ttc 	= $multicurrency_total_ttc;
 
 			$result = $this->line->update($user, $notrigger);
+
+			// delete des enreg type
+			$sqlDelType = " DELETE FROM ".MAIN_DB_PREFIX."productdefault_assignment WHERE fk_line_productdefault = ".$this->line->id;
+			$resql = $this->db->query($sqlDelType);
+			$errors = 0;
+			if ($resql >  0){
+				foreach ($typeAssignment as $type){
+
+					$sql =  " INSERT INTO  " . MAIN_DB_PREFIX . "productdefault_assignment  (fk_line_productdefault, type_assignment) ";
+					$sql .= " VALUES ( " .(int) $this->line->id . "," . (int) $type . ")";
+					$resql = $this->db->query($sql);
+					if (!$resql){
+						$errors++;
+						break;
+					}
+				}
+			}
+
 			if ($result > 0) {
+
+
+
 				// Reorder if child line
 				if (!empty($fk_parent_line)) {
 					$this->line_order(true, 'DESC');
@@ -1127,7 +1163,7 @@ class ProductThirdpartyDefault extends CommonObject
 		dol_syslog(get_class($this).'::insert', LOG_DEBUG);
 		$resql = $this->db->query($sql);
 		if ($resql) {
-			$this->rowid = $this->db->last_insert_id(MAIN_DB_PREFIX.'propaldet');
+			$this->rowid = $this->db->last_insert_id(MAIN_DB_PREFIX.'productdefault_productthirdpartydefault');
 
 			if (!$error) {
 				$this->id = $this->rowid;
@@ -1139,7 +1175,7 @@ class ProductThirdpartyDefault extends CommonObject
 
 			if (!$error && !$notrigger) {
 				// Call trigger
-				$result = $this->call_trigger('LINEPROPAL_INSERT', $user);
+				$result = $this->call_trigger('PRODUCTDEFAULT_INSERT', $user);
 				if ($result < 0) {
 					$this->db->rollback();
 					return -1;
@@ -1266,19 +1302,38 @@ class ProductThirdpartyDefault extends CommonObject
 	{
 		global $langs;
 
+
+
+
+
 		$this->db->begin();
-		$sql = " DELETE FROM ".MAIN_DB_PREFIX.$this->table_element . "  WHERE rowid =".$this->id;
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-		 $this->error = $this->db->lasterror();
-		$this->errors[] = $this->error;
-		$this->db->rollback();
-		return -1;
+
+
+		$sqlDelType = " DELETE FROM ".MAIN_DB_PREFIX."productdefault_assignment WHERE fk_line_productdefault = ".$this->id;
+		$resql = $this->db->query($sqlDelType);
+		$errors = 0;
+		if (!$resql){
+			$errors++;
+			$this->error = $this->db->lasterror();
+			$this->errors[] = $this->error;
+
 		}else{
-			$this->db->commit();
-			setEventMessages($langs->trans('ANONYMISER_SUCCESS'), array());
-			return 1;
+
+			$sql = " DELETE FROM ".MAIN_DB_PREFIX.$this->table_element . "  WHERE rowid =".$this->id;
+			$resql = $this->db->query($sql);
+			if (!$resql || $errors > 0 ) {
+				$this->error = $this->db->lasterror();
+				$this->errors[] = $this->error;
+				$this->db->rollback();
+				return -1;
+			}else{
+				$this->db->commit();
+				setEventMessages($langs->trans('ANONYMISER_SUCCESS'), array());
+				return 1;
+			}
 		}
+
+
 	}
 
 	/**

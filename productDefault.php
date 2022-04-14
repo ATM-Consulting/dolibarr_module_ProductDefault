@@ -97,12 +97,13 @@ $selected 		= GETPOST('lineid', 'int'); // Option for the css output (always '' 
 $rank 			= (GETPOST('rank', 'int') > 0) ? GETPOST('rank', 'int') : -1;
 $id 			= GETPOST('id', 'int');
 $lineid  		= GETPOST('lineid', 'int');
-var_dump($_POST);
+$TypeAssignment = GETPOST('typeAssignment', 'array');
+
+
+
 $form = new Form($db);
 
-if (!empty($cancel) || empty($action)){
-	$lineid = 0;
-}
+
 
 $usercanread = $user->rights->productdefault->lire;
 $usercancreate = $user->rights->productdefault->creer;
@@ -343,18 +344,6 @@ if ($action == 'addline' && $usercancreate) {		// Add line
 				$desc = dol_concatdesc($desc, $product_desc, '', !empty($conf->global->MAIN_CHANGE_ORDER_CONCAT_DESCRIPTION));
 			}
 
-			// Add dimensions into product description
-			/*if (empty($conf->global->MAIN_PRODUCT_DISABLE_AUTOADD_DIM))
-			{
-				$text='';
-				if ($prod->weight) $text.=($text?"\n":"").$outputlangs->trans("Weight").': '.$prod->weight.' '.$prod->weight_units;
-				if ($prod->length) $text.=($text?"\n":"").$outputlangs->trans("Length").': '.$prod->length.' '.$prod->length_units;
-				if ($prod->surface) $text.=($text?"\n":"").$outputlangs->trans("Surface").': '.$prod->surface.' '.$prod->surface_units;
-				if ($prod->volume) $text.=($text?"\n":"").$outputlangs->trans("Volume").': '.$prod->volume.' '.$prod->volume_units;
-
-				$desc = dol_concatdesc($desc, $text);
-			}*/
-
 			// Add custom code and origin country into description
 			if (empty($conf->global->MAIN_PRODUCT_DISABLE_CUSTOMCOUNTRYCODE) && (!empty($prod->customcode) || !empty($prod->country_code))) {
 				$tmptxt = '(';
@@ -433,26 +422,10 @@ if ($action == 'addline' && $usercancreate) {		// Add line
 			setEventMessages($mesg, null, 'errors');
 		} else {
 			// Insert line
-			$result = $productDefault->addline($id, $desc, $pu_ht, $qty, $tva_tx, $localtax1_tx, $localtax2_tx, $idprod, $remise_percent, $price_base_type, $pu_ttc, $info_bits, $type, min($rank, count($productDefault->lines) + 1), 0, GETPOST('fk_parent_line'), $fournprice, $buyingprice, $label, $date_start, $date_end, $array_options, $fk_unit, '', 0, $pu_ht_devise);
+			$result = $productDefault->addline($id, $TypeAssignment,$desc, $pu_ht, $qty, $tva_tx, $localtax1_tx, $localtax2_tx, $idprod, $remise_percent, $price_base_type, $pu_ttc, $info_bits, $type, min($rank, count($productDefault->lines) + 1), 0, GETPOST('fk_parent_line'), $fournprice, $buyingprice, $label, $date_start, $date_end, $array_options, $fk_unit, '', 0, $pu_ht_devise);
 
 			if ($result > 0) {
 				$db->commit();
-
-			//@todo à remettre en place aprés insertion ok
-			/*	if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE)) {
-					// Define output language
-					$outputlangs = $langs;
-					if (!empty($conf->global->MAIN_MULTILANGS)) {
-						$outputlangs = new Translate("", $conf);
-						$newlang = (GETPOST('lang_id', 'aZ09') ? GETPOST('lang_id', 'aZ09') : $object->thirdparty->default_lang);
-						$outputlangs->setDefaultLang($newlang);
-					}
-					$ret = $object->fetch($id); // Reload to get new records
-					if ($ret > 0) {
-						$object->fetch_thirdparty();
-					}
-					$object->generateDocument($object->model_pdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
-				}*/
 
 				unset($_POST['prod_entry_mode']);
 
@@ -585,25 +558,10 @@ elseif ($action == 'updateline' && $usercancreate){
 
 		$qty = price2num(GETPOST('qty', 'alpha'), 'MS');
 
-		$result = $productDefault->updateline(GETPOST('lineid', 'int'), $pu_ht, $qty, $remise_percent, $vat_rate, $localtax1_rate, $localtax2_rate, $description, 'HT', $info_bits, $special_code, GETPOST('fk_parent_line'), 0, $fournprice, $buyingprice, $label, $type, $date_start, $date_end, $array_options, GETPOST("units"), $pu_ht_devise);
+		$result = $productDefault->updateline(GETPOST('lineid', 'int'), $TypeAssignment,  $pu_ht, $qty, $remise_percent, $vat_rate, $localtax1_rate, $localtax2_rate, $description, 'HT', $info_bits, $special_code, GETPOST('fk_parent_line'), 0, $fournprice, $buyingprice, $label, $type, $date_start, $date_end, $array_options, GETPOST("units"), $pu_ht_devise);
 
 		if ($result >= 0) {
 			$db->commit();
-
-			if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE)) {
-				// Define output language
-				/*$outputlangs = $langs;
-				if (!empty($conf->global->MAIN_MULTILANGS)) {
-					$outputlangs = new Translate("", $conf);
-					$newlang = (GETPOST('lang_id', 'aZ09') ? GETPOST('lang_id', 'aZ09') : $object->thirdparty->default_lang);
-					$outputlangs->setDefaultLang($newlang);
-				}
-				$ret = $object->fetch($id); // Reload to get new records
-				if ($ret > 0) {
-					$object->fetch_thirdparty();
-				}*/
-				//$object->generateDocument($object->model_pdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
-			}
 
 			unset($_POST['qty']);
 			unset($_POST['type']);
@@ -648,6 +606,7 @@ elseif ($action == 'updateline' && $usercancreate){
 	// Delete proposal
 	// à fetcher d'abord
 	$productDefault->fetch($selected);
+
 	$result = $productDefault->delete($user);
 	if ($result > 0) {
 		header('Location: '.$_SERVER["PHP_SELF"].'?id='.$id);
@@ -657,7 +616,9 @@ elseif ($action == 'updateline' && $usercancreate){
 // Print form confirm
 
 
-
+if (!empty($cancel) || empty($action) ||  $action == "view" ||  $action == "editline"){
+	$lineid = 0;
+}
 /**
  * VIEW
  */
@@ -686,13 +647,6 @@ print '	<form name="addproduct" id="addproduct" action="'.$_SERVER["PHP_SELF"].'
 	';
 print '<table id="tablelines" class="noborder noshadow" width="100%">';
 
-	// Instanciation du multiselect type
-	/*print '<div id="select_assignment">';
-	$typeByLine = getAssignmentLines($productDefault, $object);
-	// renseignement du multiSelectarray
-	print $form->multiselectarray('typeAssignment', $productDefault->Tassignment, $typeByLine['ids'][$lineid], null, null, null, null, "300px;");
-	print '</div>';*/
-
 	if (!empty($conf->use_javascript_ajax)) {
 		include DOL_DOCUMENT_ROOT.'/core/tpl/ajaxrow.tpl.php';
 	}
@@ -705,8 +659,6 @@ print '<table id="tablelines" class="noborder noshadow" width="100%">';
 		$disableremove = 0;
 
 		$productDefault->id = $object->id;
-		//var_dump($productDefault->id);
-		//$action, $line, $var, $num, $i, $dateSelector, $seller, $buyer, $selected = 0
 
 		$productDefault->printObjectLines($action, $object,$object,$selected);
 		// Affichage du multiselect user en mode vue et editline
@@ -721,7 +673,6 @@ print '<table id="tablelines" class="noborder noshadow" width="100%">';
 	if ($action !== 'editline'){
 		$productDefault->formAddObjectLine(1, $object, $object);
 	}
-
 
 	showMultiSelect($productDefault, $object, $form, $lineid);
 
