@@ -100,6 +100,7 @@ $lineid  		= GETPOST('lineid', 'int');
 $TypeAssignment = GETPOST('typeAssignment', 'array');
 
 
+var_dump($_REQUEST);
 
 $form = new Form($db);
 
@@ -428,7 +429,7 @@ if ($action == 'addline' && $usercancreate) {		// Add line
 				$db->commit();
 
 				unset($_POST['prod_entry_mode']);
-
+				unset($_POST['typeAssignment']);
 				unset($_POST['qty']);
 				unset($_POST['type']);
 				unset($_POST['remise_percent']);
@@ -562,7 +563,7 @@ elseif ($action == 'updateline' && $usercancreate){
 
 		if ($result >= 0) {
 			$db->commit();
-
+			unset($_POST['typeAssignment']);
 			unset($_POST['qty']);
 			unset($_POST['type']);
 			unset($_POST['productid']);
@@ -616,9 +617,9 @@ elseif ($action == 'updateline' && $usercancreate){
 // Print form confirm
 
 
-if (!empty($cancel) || empty($action) ||  $action == "view" ||  $action == "editline"){
+/*if (!empty($cancel) || empty($action) ||  $action == "view" ||  $action == "editline"){
 	$lineid = 0;
-}
+}*/
 /**
  * VIEW
  */
@@ -670,11 +671,13 @@ print '<table id="tablelines" class="noborder noshadow" width="100%">';
 
 	$conf->modules_parts['tpl'] = array();
 
+
+
 	if ($action !== 'editline'){
 		$productDefault->formAddObjectLine(1, $object, $object);
 	}
 
-	showMultiSelect($productDefault, $object, $form, $lineid);
+	showMultiSelect($productDefault, $object, $form, $lineid, $action);
 
 print "</table>";
 print "</form>";
@@ -786,9 +789,11 @@ function getAssignmentLines($productDefault, $object){
  * @param $lineid
  * @return void
  */
-function showMultiSelect($productDefault, $object,&$form , $lineid){
+function showMultiSelect($productDefault, $object,&$form , $lineid,$action){
 
-	$typeByLine = getAssignmentLines($productDefault, $object);
+	if ($action == "editline") $typeByLine = getAssignmentLines($productDefault, $object);
+
+
 	// renseignement du multiSelectarray
 	$multi = $form->multiselectarray('typeAssignment', $productDefault->Tassignment, $typeByLine['ids'][$lineid], null, null, null, null, "300px;");
 	?><script>
