@@ -1214,7 +1214,7 @@ class ProductThirdpartyDefault extends CommonObject
 
 		$records = array();
 		// l'appel vient d'un trigger activé
-		if (!$trigerred){
+		if (!$triggered){
 			$sql = 'SELECT  p.label, p.ref , ';
 			$sql .= $this->getFieldList('t');
 			$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
