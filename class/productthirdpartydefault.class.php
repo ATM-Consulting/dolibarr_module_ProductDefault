@@ -1206,18 +1206,25 @@ class ProductThirdpartyDefault extends CommonObject
 	 * @param  string      $filtermode   Filter mode (AND or OR)
 	 * @return array|int                 int <0 if KO, array of pages if OK
 	 */
-	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
+	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND' ,$triggered = false)
 	{
 		global $conf;
 
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
 		$records = array();
-		//p.ref p.label
-		$sql = 'SELECT  p.label, p.ref , ';
-		$sql .= $this->getFieldList('t');
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'product'.' as p ON t.fk_product = p.rowid';
+		// l'appel vient d'un trigger activé
+		if (!$trigerred){
+			$sql = 'SELECT  p.label, p.ref , ';
+			$sql .= $this->getFieldList('t');
+			$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
+			$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'product'.' as p ON t.fk_product = p.rowid';
+		}else{
+			$sql = " SELECT * ";
+			$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t ';
+			$sql .=" INNER JOIN llx_productdefault_assignment as  pa on t.rowid = pa.fk_line_productdefault ";
+		}
+
 		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) {
 			$sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
 		} else {
@@ -1280,7 +1287,6 @@ class ProductThirdpartyDefault extends CommonObject
 			return -1;
 		}
 	}
-
 	/**
 	 * Update object into database
 	 *

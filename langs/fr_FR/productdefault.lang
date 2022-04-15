@@ -57,4 +57,10 @@ TYPE_ASSIGNMENT_ORDER_LANG=Commande
 productdefault=Produits par défaut
 ConfirmDeleteProductLine=Êtes-vous sûr de vouloir effacer cette ligne produit ?
 DeleteProductLine=Supprimer la ligne de produits
-AssignedProducts=Liste des produits assignés
+AssignedProducts=Ajout de produit/service par défaut pour le tier
+
+#
+# error
+#
+
+Assignementmandatory=Vous devez sélectionner une assignation pour ce produit

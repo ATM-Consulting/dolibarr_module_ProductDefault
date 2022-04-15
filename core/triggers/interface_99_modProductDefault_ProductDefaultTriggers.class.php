@@ -161,7 +161,7 @@ class InterfaceProductDefaultTriggers extends DolibarrTriggers
 
 			// Customer orders
 			case 'ORDER_CREATE':
-				// AJOUT AUTOMATIQUE DES PRODUITS PAR DEFAUT  ASSIGNÉS AU  TIER DE CETTE COMMANDE
+				/*// AJOUT AUTOMATIQUE DES PRODUITS PAR DEFAUT  ASSIGNÉS AU  TIER DE CETTE COMMANDE
 				dol_include_once('/productdefault/class/productthirdpartydefault.class.php');
 				$sql = " SELECT * FROM " . MAIN_DB_PREFIX . "productdefault_productthirdpartydefault  as pp";
 				$sql .=" INNER JOIN llx_productdefault_assignment as  pa on pp.rowid = pa.fk_line_productdefault ";
@@ -175,7 +175,22 @@ class InterfaceProductDefaultTriggers extends DolibarrTriggers
 						$object->update($user);
 					}
 				}
+				break*/;
+				// AJOUT AUTOMATIQUE DES PRODUITS PAR DEFAUT  ASSIGNÉS AU  TIER DE CETTE PROPOSITION COMMERCIALE
+				dol_include_once('/productdefault/class/productthirdpartydefault.class.php');
+				$pdefault = new ProductThirdpartyDefault($db);
+				$records = $pdefault->fetchAll('','',0,0, array('t.fk_soc' => $object->socid, 'pa.type_assignment'  => ProductThirdpartyDefault::TYPE_ASSIGNMENT_ORDER,'t.entity'=> $conf->entity ),'AND',true);
+
+				foreach ($records as $record){
+
+					$object->addLine($record->description,$record->subprice,$record->qty,$record->tva_tx,0,0,$record->fk_product);
+					$object->update($user);
+				}
 				break;
+
+
+
+
 			//case 'ORDER_MODIFY':
 			//case 'ORDER_VALIDATE':
 			//case 'ORDER_DELETE':
@@ -207,20 +222,15 @@ class InterfaceProductDefaultTriggers extends DolibarrTriggers
 
 				// AJOUT AUTOMATIQUE DES PRODUITS PAR DEFAUT  ASSIGNÉS AU  TIER DE CETTE PROPOSITION COMMERCIALE
 				dol_include_once('/productdefault/class/productthirdpartydefault.class.php');
-				$sql = " SELECT * FROM " . MAIN_DB_PREFIX . "productdefault_productthirdpartydefault  as pp";
-				$sql .=" INNER JOIN llx_productdefault_assignment as  pa on pp.rowid = pa.fk_line_productdefault ";
-				$sql .=" WHERE pp.fk_soc =". $object->socid;
-				$sql .=" AND pa.type_assignment =" . ProductThirdpartyDefault::TYPE_ASSIGNMENT_PROPOSAL;
-				$sql .=" AND pp.entity=".$conf->entity;
-				$resql = $db->query($sql);
-				if ($resql){
-					while ($obj = $db->fetch_object($resql)){
-						$object->addLine($obj->description,$obj->subprice,$obj->qty,$obj->tva_tx,0,0,$obj->fk_product);
+				$pdefault = new ProductThirdpartyDefault($db);
+				$records = $pdefault->fetchAll('','',0,0, array('t.fk_soc' => $object->socid, 'pa.type_assignment'  => ProductThirdpartyDefault::TYPE_ASSIGNMENT_PROPOSAL,'t.entity'=> $conf->entity ),'AND',true);
+				foreach ($records as $record){
+						$object->addLine($record->description,$record->subprice,$record->qty,$record->tva_tx,0,0,$record->fk_product);
 						$object->update($user);
-					}
 				}
-
 				break;
+
+
 
 			//case 'PROPAL_MODIFY':
 			//case 'PROPAL_VALIDATE':
