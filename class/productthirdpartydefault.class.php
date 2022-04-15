@@ -1261,8 +1261,7 @@ class ProductThirdpartyDefault extends CommonObject
 				$record->setVarsFromFetchObj($obj);
 				// on ajoute les valeurs ajouter dans le fetch all
 				$record->ref = $obj->ref;
-				$record->label = $obj->label;
-				//$record->product_label = $obj->label;
+				$record->product_label = $record->label = $obj->label;
 
 				$records[$record->id] = $record;
 
