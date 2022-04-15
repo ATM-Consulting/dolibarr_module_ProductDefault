@@ -137,6 +137,7 @@ class ProductThirdpartyDefault extends CommonObject
 		'fk_multicurrency' =>array('type'=>'integer', 'label'=>'MulticurrencyID', 'enabled'=>1, 'visible'=>-1, 'position'=>230),
 		'multicurrency_code' =>array('type'=>'varchar(255)', 'label'=>'MulticurrencyCurrency', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>235),
 		//'multicurrency_tx' =>array('type'=>'double(24,8)', 'label'=>'MulticurrencyRate', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>240, 'isameasure'=>1),
+		'multicurrency_subprice' =>array('type'=>'double', 'label'=>'subPrice', 'enabled'=>1, 'visible'=>-1, 'position'=>105),
 		'multicurrency_total_ht' =>array('type'=>'double(24,8)', 'label'=>'MulticurrencyAmountHT', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>245, 'isameasure'=>1),
 		'multicurrency_total_tva' =>array('type'=>'double(24,8)', 'label'=>'MulticurrencyAmountVAT', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>250, 'isameasure'=>1),
 		'multicurrency_total_ttc' =>array('type'=>'double(24,8)', 'label'=>'MulticurrencyAmountTTC', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>255, 'isameasure'=>1),
@@ -1115,7 +1116,7 @@ class ProductThirdpartyDefault extends CommonObject
 
 		// Insert line into database
 		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'productdefault_productthirdpartydefault';
-		$sql .= ' (fk_soc, label, description, fk_product, product_type,';
+		$sql .= ' (fk_soc, entity, label, description, fk_product, product_type,';
 		$sql .= ' fk_remise_except, qty, vat_src_code, tva_tx, localtax1_tx, localtax2_tx, localtax1_type, localtax2_type,';
 		$sql .= ' subprice, remise_percent, ';
 		$sql .= ' info_bits, ';
@@ -1125,6 +1126,7 @@ class ProductThirdpartyDefault extends CommonObject
 		$sql .= ', fk_multicurrency, multicurrency_code, multicurrency_subprice, multicurrency_total_ht, multicurrency_total_tva, multicurrency_total_ttc)';
 		$sql .= " VALUES (";
 		$sql .= " ".$this->db->escape($this->fk_soc).",";
+		$sql .= " ".$this->db->escape($conf->entity).",";
 		$sql .= " ".(!empty($this->label) ? "'".$this->db->escape($this->label)."'" : "null").",";
 		$sql .= " '".$this->db->escape($this->desc)."',";
 		$sql .= " ".($this->fk_product ? "'".$this->db->escape($this->fk_product)."'" : "null").",";
@@ -1215,12 +1217,13 @@ class ProductThirdpartyDefault extends CommonObject
 		$sql = 'SELECT  p.label, p.ref , ';
 		$sql .= $this->getFieldList('t');
 		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		$sql .= ' INNER JOIN '.MAIN_DB_PREFIX.'product'.' as p ON t.fk_product = p.rowid';
+		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'product'.' as p ON t.fk_product = p.rowid';
 		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) {
 			$sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
 		} else {
 			$sql .= ' WHERE 1 = 1';
 		}
+
 		// Manage filter
 		$sqlwhere = array();
 		if (count($filter) > 0) {

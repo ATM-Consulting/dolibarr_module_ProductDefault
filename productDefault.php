@@ -17,9 +17,9 @@
  */
 
 /**
- *   	\file       productthirdpartydefault_list.php
+ *   	\file       productthirdpartdefault.php
  *		\ingroup    productdefault
- *		\brief      List page for productthirdpartydefault
+ *		\brief      product asignment for the current thirdparty
  */
 
 //if (! defined('NOREQUIREDB'))              define('NOREQUIREDB', '1');				// Do not create database handler $db
@@ -99,12 +99,7 @@ $id 			= GETPOST('id', 'int');
 $lineid  		= GETPOST('lineid', 'int');
 $TypeAssignment = GETPOST('typeAssignment', 'array');
 
-
-var_dump($_REQUEST);
-
 $form = new Form($db);
-
-
 
 $usercanread = $user->rights->productdefault->lire;
 $usercancreate = $user->rights->productdefault->creer;
@@ -112,13 +107,31 @@ $usercandelete = $user->rights->productdefault->supprimer;
 
 $object = new Societe($db);
 $object->fetch($id);
+
+// on a besoin que ce champs soit renseigné pour la suite
 $object->socid = $object->id;
+
+
 $extrafields = new ExtraFields($db);
 $productDefault = new ProductThirdpartyDefault($db);
+
+// Multicurrency (test on $this->multicurrency_tx because we should take the default rate only if not using origin rate)
+if (!empty($object->multicurrency_code) && empty($productDefault->multicurrency_tx)) {
+	list($productDefault->fk_multicurrency, $productDefault->multicurrency_tx) = MultiCurrency::getIdAndTxFromCode($db, $object->multicurrency_code);
+} else {
+	$this->fk_multicurrency = MultiCurrency::getIdFromCode($this->db, $this->multicurrency_code);
+}
+if (empty($productDefault->fk_multicurrency)) {
+	$productDefault->multicurrency_code = $conf->currency;
+	$productDefault->fk_multicurrency = 0;
+	$productDefault->multicurrency_tx = 1;
+}
+
 $formconfirm = "";
 
 /** CRUD AJOUT LIGNE  */
-if ($action == 'addline' && $usercancreate) {		// Add line
+if ($action == 'addline' && $usercancreate) {
+	// Add line
 	// Set if we used free entry or predefined product
 	$predef = '';
 	$product_desc = (GETPOSTISSET('dp_desc') ? GETPOST('dp_desc', 'restricthtml') : '');
@@ -617,17 +630,14 @@ elseif ($action == 'updateline' && $usercancreate){
 // Print form confirm
 
 
-/*if (!empty($cancel) || empty($action) ||  $action == "view" ||  $action == "editline"){
-	$lineid = 0;
-}*/
+
 /**
  * VIEW
  */
 
 
-$morejs[] = '/custom/clieurochef/js/import.js';
 $acceptedEncodings = array('UTF-8', 'latin1', 'ISO-8859-1', 'ISO-8859-15', 'macintosh');
-llxHeader('', '', '', '', '','', $morejs, 0, 0);
+llxHeader('', '', '', '', '','', '', 0, 0);
 
 $head = societe_prepare_head($object);
 print  dol_get_fiche_head($head, 'productdefault', $langs->trans('productdefault'), -1, 'productdefault');
@@ -646,7 +656,7 @@ print '	<form name="addproduct" id="addproduct" action="'.$_SERVER["PHP_SELF"].'
 	<input type="hidden" name="page_y" value="">
 	<input type="hidden" name="id" value="' . $object->id.'">
 	';
-print '<table id="tablelines" class="noborder noshadow" width="100%">';
+
 
 	if (!empty($conf->use_javascript_ajax)) {
 		include DOL_DOCUMENT_ROOT.'/core/tpl/ajaxrow.tpl.php';
@@ -655,23 +665,24 @@ print '<table id="tablelines" class="noborder noshadow" width="100%">';
 	printColAssignment($productDefault);
 
 	if ( is_array( $productDefault->lines) && !empty($productDefault->lines)) {
+
+
 		$disableedit = 0;
 		$disablemove = 1;
 		$disableremove = 0;
 
-		$productDefault->id = $object->id;
+		print load_fiche_titre($langs->trans("AssignedProducts"));
 
+		print '<table id="tablelines" class="noborder noshadow" width="100%">';
+		$productDefault->id = $object->id;
+		// ici j'ai un gros doute sur object object
 		$productDefault->printObjectLines($action, $object,$object,$selected);
 		// Affichage du multiselect user en mode vue et editline
 		$colspan_plus=1; // initialisation du nombre de td à ajouter dans les colspan
 
-		// Affichage des type assignment liés aux lignes
+		// Affichage des types assignments liés aux lignes
 		showAssignmentLine($productDefault, $object);
 	}
-
-	$conf->modules_parts['tpl'] = array();
-
-
 
 	if ($action !== 'editline'){
 		$productDefault->formAddObjectLine(1, $object, $object);
@@ -686,7 +697,7 @@ print "</form>";
 print $formconfirm;
 
 
-
+print llxFooter();
 
 
 /**
@@ -743,9 +754,16 @@ function showAssignmentLine($productDefault, $object){
 				let UsersByLine = <?php echo json_encode($typeByLine['types']); ?>;
 				"tr[id^='row-']"
 				$("#tablelines").find("tr[id^='row-']").each(function() {
-					//$("#tablelines").find(".linetr").each(function() {
 					if(typeof UsersByLine[$(this).data('id')] !== 'undefined');
-					$(this).find(".content_line_Assignment").append(UsersByLine[$(this).data('id')]);
+					let list = UsersByLine[$(this).data('id')].split(" ");
+
+					list.forEach((item, index) => {
+						if (item){
+							$(this).find(".content_line_Assignment").append('<span class="badgeneutral " style="margin :5px; padding:5px;">' +  item + '</span>');
+						}
+
+					})
+
 				});
 			});
 		</script>
@@ -773,7 +791,7 @@ function getAssignmentLines($productDefault, $object){
 	if ($resql) {
 		while ($ob = $db->fetch_object($resql)) {
 			$id_line = $ob->id_line;
-			$typeByLine['types'][$id_line] .=  $langs->trans($productDefault->Tassignment[$ob->type]) . '<br>';
+			$typeByLine['types'][$id_line] .=  " " . $langs->trans($productDefault->Tassignment[$ob->type]) ;
 			$typeByLine['ids'][$id_line][] = $ob->type;
 		}
 	}

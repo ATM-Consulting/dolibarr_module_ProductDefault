@@ -92,6 +92,8 @@ class InterfaceProductDefaultTriggers extends DolibarrTriggers
 	 */
 	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
 	{
+		global $db;
+
 		if (empty($conf->productdefault) || empty($conf->productdefault->enabled)) {
 			return 0; // If module is not enabled, we do nothing
 		}
@@ -158,7 +160,22 @@ class InterfaceProductDefaultTriggers extends DolibarrTriggers
 			//case 'MYECMDIR_DELETE':
 
 			// Customer orders
-			//case 'ORDER_CREATE':
+			case 'ORDER_CREATE':
+				// AJOUT AUTOMATIQUE DES PRODUITS PAR DEFAUT  ASSIGNÉS AU  TIER DE CETTE COMMANDE
+				dol_include_once('/productdefault/class/productthirdpartydefault.class.php');
+				$sql = " SELECT * FROM " . MAIN_DB_PREFIX . "productdefault_productthirdpartydefault  as pp";
+				$sql .=" INNER JOIN llx_productdefault_assignment as  pa on pp.rowid = pa.fk_line_productdefault ";
+				$sql .=" WHERE pp.fk_soc =". $object->socid;
+				$sql .=" AND pa.type_assignment =" . ProductThirdpartyDefault::TYPE_ASSIGNMENT_ORDER;
+				$sql .=" AND pp.entity=".$conf->entity;
+				$resql = $db->query($sql);
+				if ($resql){
+					while ($obj = $db->fetch_object($resql)){
+						$object->addLine($obj->description,$obj->subprice,$obj->qty,$obj->tva_tx,0,0,$obj->fk_product);
+						$object->update($user);
+					}
+				}
+				break;
 			//case 'ORDER_MODIFY':
 			//case 'ORDER_VALIDATE':
 			//case 'ORDER_DELETE':
@@ -186,7 +203,25 @@ class InterfaceProductDefaultTriggers extends DolibarrTriggers
 			//case 'LINEORDER_SUPPLIER_DELETE':
 
 			// Proposals
-			//case 'PROPAL_CREATE':
+			case 'PROPAL_CREATE':
+
+				// AJOUT AUTOMATIQUE DES PRODUITS PAR DEFAUT  ASSIGNÉS AU  TIER DE CETTE PROPOSITION COMMERCIALE
+				dol_include_once('/productdefault/class/productthirdpartydefault.class.php');
+				$sql = " SELECT * FROM " . MAIN_DB_PREFIX . "productdefault_productthirdpartydefault  as pp";
+				$sql .=" INNER JOIN llx_productdefault_assignment as  pa on pp.rowid = pa.fk_line_productdefault ";
+				$sql .=" WHERE pp.fk_soc =". $object->socid;
+				$sql .=" AND pa.type_assignment =" . ProductThirdpartyDefault::TYPE_ASSIGNMENT_PROPOSAL;
+				$sql .=" AND pp.entity=".$conf->entity;
+				$resql = $db->query($sql);
+				if ($resql){
+					while ($obj = $db->fetch_object($resql)){
+						$object->addLine($obj->description,$obj->subprice,$obj->qty,$obj->tva_tx,0,0,$obj->fk_product);
+						$object->update($user);
+					}
+				}
+
+				break;
+
 			//case 'PROPAL_MODIFY':
 			//case 'PROPAL_VALIDATE':
 			//case 'PROPAL_SENTBYMAIL':

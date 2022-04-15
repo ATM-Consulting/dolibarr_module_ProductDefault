@@ -55,3 +55,6 @@ MyWidgetDescription = My widget description
 TYPE_ASSIGNMENT_PROPOSAL_LANG=Devis
 TYPE_ASSIGNMENT_ORDER_LANG=Commande
 productdefault=Produits par défaut
+ConfirmDeleteProductLine=Êtes-vous sûr de vouloir effacer cette ligne produit ?
+DeleteProductLine=Supprimer la ligne de produits
+AssignedProducts=Liste des produits assignés
