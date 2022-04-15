@@ -1336,7 +1336,7 @@ class ProductThirdpartyDefault extends CommonObject
 				return -1;
 			}else{
 				$this->db->commit();
-				setEventMessages($langs->trans('ANONYMISER_SUCCESS'), array());
+				setEventMessages($langs->trans('DELETE_SUCCESS'), array());
 				return 1;
 			}
 		}
