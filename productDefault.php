@@ -676,7 +676,7 @@ print '	<form name="addproduct" id="addproduct" action="'.$_SERVER["PHP_SELF"].'
 	';
 
 
-print load_fiche_titre($langs->trans("AssignedProducts",'','generic'));
+print load_fiche_titre($langs->transnoentities("AssignedProducts", $object->getNomUrl(1)),'','product');
 
 print '<table id="tablelines" class="noborder noshadow" width="100%">';
 
@@ -737,7 +737,7 @@ function printColAssignment($productDefault) {
 		$(document).ready(function() {
 			console.log("col to add")
 			// Affichage du titre de la colonne
-			let title = <?php echo json_encode($langs->trans('Assignment')); ?>;
+			let title = <?php echo json_encode($langs->trans('ConcernedDocuments')); ?>;
 			$('<td>'+title+'</td>').insertAfter($(".liste_titre").find(".linecoldescription"));
 
 
