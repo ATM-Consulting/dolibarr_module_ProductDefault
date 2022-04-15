@@ -119,7 +119,7 @@ $productDefault = new ProductThirdpartyDefault($db);
 if (!empty($object->multicurrency_code) && empty($productDefault->multicurrency_tx)) {
 	list($productDefault->fk_multicurrency, $productDefault->multicurrency_tx) = MultiCurrency::getIdAndTxFromCode($db, $object->multicurrency_code);
 } else {
-	$this->fk_multicurrency = MultiCurrency::getIdFromCode($this->db, $this->multicurrency_code);
+	$productDefault->fk_multicurrency = MultiCurrency::getIdFromCode($db, $object->multicurrency_code);
 }
 if (empty($productDefault->fk_multicurrency)) {
 	$productDefault->multicurrency_code = $conf->currency;
