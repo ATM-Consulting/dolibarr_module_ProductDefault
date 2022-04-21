@@ -168,7 +168,6 @@ class InterfaceProductDefaultTriggers extends DolibarrTriggers
 				$records = $pdefault->fetchAll('','',0,0, array('t.fk_soc' => $object->socid, 'pa.type_assignment'  => ProductThirdpartyDefault::TYPE_ASSIGNMENT_ORDER,'t.entity'=> $conf->entity ),'AND',true);
 				//var_dump($records);
 				foreach ($records as $record){
-
 					$object->addLine($record->description,
 									 $record->subprice,
 									 $record->qty,
@@ -188,11 +187,10 @@ class InterfaceProductDefaultTriggers extends DolibarrTriggers
 									0,
 									0,
 									null,
-									0,
+									$record->buy_price_ht, //pa_ht
 									"",
 									0,
 									$record->fk_unit);
-
 					$object->update($user);
 				}
 				break;
@@ -250,7 +248,7 @@ class InterfaceProductDefaultTriggers extends DolibarrTriggers
 							0, //special code
 							0,
 							0,
-							0,
+							$record->buy_price_ht,
 							'',
 							'',
 							'',
