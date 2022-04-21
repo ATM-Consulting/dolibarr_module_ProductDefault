@@ -103,6 +103,7 @@ class ProductThirdpartyDefault extends CommonObject
 	 */
 	public $fields=array(
 		'rowid' =>array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>10),
+		'fk_unit' =>array('type'=>'integer', 'label'=>'fk_unit', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>11),
 		'entity' =>array('type'=>'integer', 'label'=>'Entity', 'default'=>1, 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>15, 'index'=>1),
 		'fk_soc' =>array('type'=>'integer:Societe:societe/class/societe.class.php', 'label'=>'ThirdParty', 'enabled'=>1, 'visible'=>-1, 'position'=>23),
 		//'fk_projet' =>array('type'=>'integer:Project:projet/class/project.class.php:1:fk_statut=1', 'label'=>'Fk projet', 'enabled'=>1, 'visible'=>-1, 'position'=>24),
@@ -258,7 +259,7 @@ class ProductThirdpartyDefault extends CommonObject
 	// END MODULEBUILDER PROPERTIES;
 
 	public $statut = 0;
-
+	public $fk_unit;
 	// /**
 	//  * @var ProductThirdpartyDefaultLine[]     Array of subtable lines
 	//  */
@@ -1215,7 +1216,7 @@ class ProductThirdpartyDefault extends CommonObject
 		$records = array();
 		// l'appel vient d'un trigger activé
 		if (!$triggered){
-			$sql = 'SELECT  p.label, p.ref , ';
+			$sql = 'SELECT  p.label, p.ref, ';
 			$sql .= $this->getFieldList('t');
 			$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
 			$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'product'.' as p ON t.fk_product = p.rowid';
@@ -1259,7 +1260,7 @@ class ProductThirdpartyDefault extends CommonObject
 			$sql .= ' '.$this->db->plimit($limit, $offset);
 		}
 
-		//var_dump($sql);
+
 		$resql = $this->db->query($sql);
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
@@ -1272,7 +1273,7 @@ class ProductThirdpartyDefault extends CommonObject
 				// on ajoute les valeurs ajouter dans le fetch all
 				$record->ref = $obj->ref;
 				$record->product_label = $record->label = $obj->label;
-
+				$record->fk_unit = $obj->fk_unit;
 				$records[$record->id] = $record;
 
 				$i++;
