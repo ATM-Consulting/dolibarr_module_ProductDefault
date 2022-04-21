@@ -63,5 +63,5 @@ DELETE_SUCCESS=Suppression de la ligne
 # error
 #
 
-Assignementmandatory=Vous devez sélectionner une assignation pour ce produit
+Assignementmandatory=Vous devez sélectionner au moins un type de document
 ConcernedDocuments=Document(s) concerné(s)

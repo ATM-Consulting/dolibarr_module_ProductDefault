@@ -692,7 +692,7 @@ print '<table id="tablelines" class="noborder noshadow" width="100%">';
 		$disableedit = 0;
 		$disablemove = 1;
 		$disableremove = 0;
-
+		$usemargins = 1; // en fait c'est déjà fait dans les tpl que de ligne j'ai copiés et modifiés
 
 
 		$productDefault->id = $object->id;
@@ -705,7 +705,7 @@ print '<table id="tablelines" class="noborder noshadow" width="100%">';
 		showAssignmentLine($productDefault, $object);
 	}
 
-	//$conf->modules_parts['tpl'] = array();
+//	$conf->modules_parts['tpl'] = array();
 
 	if ($action !== 'editline'){
 		$productDefault->formAddObjectLine(1, $object, $object);

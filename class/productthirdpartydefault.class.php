@@ -125,6 +125,7 @@ class ProductThirdpartyDefault extends CommonObject
 		//'remise' =>array('type'=>'double', 'label'=>'Remise', 'enabled'=>1, 'visible'=>-1, 'position'=>120),
 		'total_ht' =>array('type'=>'double(24,8)', 'label'=>'TotalHT', 'enabled'=>1, 'visible'=>-1, 'position'=>125, 'isameasure'=>1),
 		'total_tva' =>array('type'=>'double(24,8)', 'label'=>'VAT', 'enabled'=>1, 'visible'=>-1, 'position'=>130, 'isameasure'=>1),
+		'buy_price_ht' =>array('type'=>'double(24,8)', 'label'=>'BuyingPrice', 'enabled'=>1, 'visible'=>-1, 'position'=>125, 'isameasure'=>1),
 		//'localtax1' =>array('type'=>'double(24,8)', 'label'=>'LocalTax1', 'enabled'=>1, 'visible'=>-1, 'position'=>135, 'isameasure'=>1),
 		//'localtax2' =>array('type'=>'double(24,8)', 'label'=>'LocalTax2', 'enabled'=>1, 'visible'=>-1, 'position'=>140, 'isameasure'=>1),
 		'total_ttc' =>array('type'=>'double(24,8)', 'label'=>'TotalTTC', 'enabled'=>1, 'visible'=>-1, 'position'=>145, 'isameasure'=>1),
@@ -725,6 +726,7 @@ class ProductThirdpartyDefault extends CommonObject
 		$txlocaltax1 = price2num($txlocaltax1);
 		$txlocaltax2 = price2num($txlocaltax2);
 		$pa_ht = price2num($pa_ht);
+
 		if (empty($qty) && empty($special_code)) {
 			$special_code = 3; // Set option tag
 		}
@@ -825,7 +827,7 @@ class ProductThirdpartyDefault extends CommonObject
 			$this->line->fk_unit = $fk_unit;
 
 			$this->line->fk_fournprice = $fk_fournprice;
-			$this->line->pa_ht = $pa_ht;
+			$this->line->pa_ht = $this->line->buy_price_ht = $pa_ht;
 
 			$this->line->date_start = $date_start;
 			$this->line->date_end = $date_end;
@@ -1274,6 +1276,7 @@ class ProductThirdpartyDefault extends CommonObject
 				$record->ref = $obj->ref;
 				$record->product_label = $record->label = $obj->label;
 				$record->fk_unit = $obj->fk_unit;
+				$record->pa_ht = $obj->buy_price_ht;
 				$records[$record->id] = $record;
 
 				$i++;
