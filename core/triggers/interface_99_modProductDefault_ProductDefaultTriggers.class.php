@@ -148,7 +148,6 @@ class InterfaceProductDefaultTriggers extends DolibarrTriggers
 									"",
 									0,
 									$record->fk_unit);
-					$object->update($user);
 				}
 				break;
 
@@ -182,7 +181,6 @@ class InterfaceProductDefaultTriggers extends DolibarrTriggers
 							$record->date_end,
 							0,
 							$record->fk_unit);
-						$object->update($user);
 				}
 				break;
 
