@@ -137,8 +137,8 @@ class InterfaceProductDefaultTriggers extends DolibarrTriggers
 									0,
 									'HT',
 									0,
-									"",
-									"",
+									$record->date_start,
+									$record->date_end,
 									0,
 									-1,
 									0,
@@ -178,8 +178,8 @@ class InterfaceProductDefaultTriggers extends DolibarrTriggers
 							0,
 							$record->buy_price_ht,
 							'',
-							'',
-							'',
+							$record->date_start,
+							$record->date_end,
 							0,
 							$record->fk_unit);
 						$object->update($user);

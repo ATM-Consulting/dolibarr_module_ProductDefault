@@ -704,7 +704,7 @@ print '<table id="tablelines" class="noborder noshadow" width="100%">';
 		$conf->modules_parts['tpl'] = array('productdefault' => '/productdefault/core/tpl');
 
 		// ici on met 2 fois $object pour respecter le nombre de paramtres, mais en vérité, la fonction n'utilise pas ces paramètres
-		$productDefault->printObjectLines($action, $object,$object,$selected);
+		$productDefault->printObjectLines($action, $object,$object,$selected, 1);
 
 		// Affichage des types assignments liés aux lignes
 		showAssignmentLine($productDefault, $object);

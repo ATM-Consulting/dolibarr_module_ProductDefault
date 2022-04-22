@@ -109,6 +109,8 @@ class ProductThirdpartyDefault extends CommonObject
 		//'fk_projet' =>array('type'=>'integer:Project:projet/class/project.class.php:1:fk_statut=1', 'label'=>'Fk projet', 'enabled'=>1, 'visible'=>-1, 'position'=>24),
 		'fk_product' =>array('type'=>'integer:Product:product/class/product.class.php:1:fk_statut=1', 'label'=>'Fk product', 'enabled'=>1, 'visible'=>-1, 'position'=>25),
 		'product_type' =>array('type'=>'integer', 'label'=>'productType', 'enabled'=>1, 'visible'=>-1, 'position'=>25),
+		'date_start' =>array('type'=>'datetime', 'label'=>'DateStart', 'enabled'=>1, 'visible'=>-1, 'position'=>55),
+		'date_end' =>array('type'=>'datetime', 'label'=>'DateEnd', 'enabled'=>1, 'visible'=>-1, 'position'=>55),
 		//'tms' =>array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>25),
 		//'datec' =>array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-1, 'position'=>55),
 		//'datep' =>array('type'=>'date', 'label'=>'Date', 'enabled'=>1, 'visible'=>-1, 'position'=>60),
@@ -1287,6 +1289,8 @@ class ProductThirdpartyDefault extends CommonObject
 				$record->product_label = $record->label = $obj->label;
 				$record->fk_unit = $obj->fk_unit;
 				$record->pa_ht = $obj->buy_price_ht;
+				$record->date_start = $obj->date_start;
+				$record->date_end = $obj->date_end;
 				$records[$record->id] = $record;
 
 				$i++;
