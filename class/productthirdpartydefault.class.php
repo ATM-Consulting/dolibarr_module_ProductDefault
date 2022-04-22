@@ -1130,7 +1130,7 @@ class ProductThirdpartyDefault extends CommonObject
 		$this->db->begin();
 
 		// Insert line into database
-		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'productdefault_productthirdpartydefault';
+		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.$this->table_element_line;
 		$sql .= ' (fk_soc, entity, label, description, fk_product, product_type,';
 		$sql .= ' fk_remise_except, qty, vat_src_code, tva_tx, localtax1_tx, localtax2_tx, localtax1_type, localtax2_type,';
 		$sql .= ' subprice, remise_percent, ';
@@ -1180,7 +1180,7 @@ class ProductThirdpartyDefault extends CommonObject
 		dol_syslog(get_class($this).'::insert', LOG_DEBUG);
 		$resql = $this->db->query($sql);
 		if ($resql) {
-			$this->rowid = $this->db->last_insert_id(MAIN_DB_PREFIX.'productdefault_productthirdpartydefault');
+			$this->rowid = $this->db->last_insert_id(MAIN_DB_PREFIX.$this->table_element_line);
 
 			if (!$error) {
 				$this->id = $this->rowid;
