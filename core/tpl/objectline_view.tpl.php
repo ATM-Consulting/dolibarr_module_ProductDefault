@@ -39,6 +39,12 @@
  * $text, $description, $line
  */
 
+/************************************************************************************************
+ * Ici j'ai dû copier les tpl standard pour pouvoir les personnaliser,
+ * notament sur l'utilisation des marges (et donc l'affichage des prix d'achat des lignes),
+ * car sinon réservé uniquement aux propal, cmd et factures et impossible de hacker les tpl std
+ ************************************************************************************************/
+
 // Protection to avoid direct call of template
 if (empty($object) || !is_object($object)) {
 	print "Error, template page can't be called as URL";

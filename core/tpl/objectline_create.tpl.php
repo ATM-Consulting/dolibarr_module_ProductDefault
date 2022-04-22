@@ -35,6 +35,14 @@
  * $inputalsopricewithtax (0 by default, 1 to also show column with unit price including tax)
  */
 
+
+/************************************************************************************************
+ * Ici j'ai dû copier les tpl standard pour pouvoir les personnaliser,
+ * notament sur l'utilisation des marges (et donc l'affichage des prix d'achat des lignes),
+ * car sinon réservé uniquement aux propal, cmd et factures et impossible de hacker les tpl std
+ ************************************************************************************************/
+
+
 // Protection to avoid direct call of template
 if (empty($object) || !is_object($object)) {
 	print "Error: this template page cannot be called directly as an URL";
