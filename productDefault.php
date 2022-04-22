@@ -664,7 +664,7 @@ llxHeader('', '', '', '', '','', '', 0, 0);
 $head = societe_prepare_head($object);
 print  dol_get_fiche_head($head, 'productdefault', $langs->trans('productdefault'), -1, 'productdefault');
 $linkback = '<a href="'.DOL_URL_ROOT.'/societe/list.php?restore_lastsearch_values=1">'.$langs->trans("BackToList").'</a>';
-dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', '');
+dol_banner_tab($object, 'id', $linkback,  ($user->socid ? 0 : 1), 'rowid', 'nom');
 print "<hr>";
 
 $productDefault->lines = $productDefault->fetchAll("","",0,0,array('fk_soc' => $id));
