@@ -660,7 +660,7 @@ $acceptedEncodings = array('UTF-8', 'latin1', 'ISO-8859-1', 'ISO-8859-15', 'maci
 llxHeader('', '', '', '', '','', '', 0, 0);
 
 $head = societe_prepare_head($object);
-print  dol_get_fiche_head($head, 'productdefault', $langs->trans('productdefault'), -1, 'productdefault');
+print  dol_get_fiche_head($head, 'productdefault', $langs->trans('productdefault'), -1, 'company');
 $linkback = '<a href="'.DOL_URL_ROOT.'/societe/list.php?restore_lastsearch_values=1">'.$langs->trans("BackToList").'</a>';
 dol_banner_tab($object, 'id', $linkback,  ($user->socid ? 0 : 1), 'rowid', 'nom');
 print "<hr>";

@@ -18,9 +18,9 @@
 #
 
 # Module label 'ModuleProductDefaultName'
-ModuleProductDefaultName = ProductDefault
+ModuleProductDefaultName = Produits par défaut
 # Module description 'ModuleProductDefaultDesc'
-ModuleProductDefaultDesc = ProductDefault description
+ModuleProductDefaultDesc = Ajout de produits / services par défaut pour chaque tiers, importés automatiquement lors de la création de propositions et commandes
 
 #
 # Admin page
