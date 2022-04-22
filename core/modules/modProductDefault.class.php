@@ -130,7 +130,7 @@ class modProductDefault extends DolibarrModules
 		$this->dirs = array("/productdefault/temp");
 
 		// Config pages. Put here list of php page, stored into productdefault/admin directory, to use to setup module.
-		$this->config_page_url = array("setup.php@productdefault");
+		//$this->config_page_url = array("setup.php@productdefault");
 
 		// Dependencies
 		// A condition to hide module
