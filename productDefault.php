@@ -134,6 +134,7 @@ if ($action == 'addline' && $usercancreate) {
 	$errors = 0;
 	if (empty($TypeAssignment)){
 		setEventMessage($langs->trans('Assignementmandatory'),'errors');
+
 		$errors++;
 	}
 
@@ -496,10 +497,7 @@ elseif ($action == 'updateline' && $usercancreate){
 	if (empty($TypeAssignment)){
 		setEventMessage($langs->trans('Assignementmandatory'),'errors');
 		$errors++;
-	}
-
-	if (empty(GETPOST('price_ht','int'))){
-		$pu_ht = 0;
+		$action = 'editline';
 	}
 
 	if ($errors == 0){
