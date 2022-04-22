@@ -699,17 +699,20 @@ print '<table id="tablelines" class="noborder noshadow" width="100%">';
 		$usemargins = 1; // en fait c'est déjà fait dans les tpl que de ligne j'ai copiés et modifiés
 
 
+		// nécessaire pour la construction de l'url du bouton editline
 		$productDefault->id = $object->id;
-		// ici j'ai un gros doute sur object object
+
+		// nécessaire pour forcer l'utilisation de la copie des tpl create view update et title (eux mêmes obligatoires pour forcer l'utilisation du module marges)
+		$conf->modules_parts['tpl'] = array('productdefault' => '/productdefault/core/tpl');
+
+		// ici on met 2 fois $object pour respecter le nombre de paramtres, mais en vérité, la fonction n'utilise pas ces paramètres
 		$productDefault->printObjectLines($action, $object,$object,$selected);
-		// Affichage du multiselect user en mode vue et editline
-		$colspan_plus=1; // initialisation du nombre de td à ajouter dans les colspan
 
 		// Affichage des types assignments liés aux lignes
 		showAssignmentLine($productDefault, $object);
 	}
 
-//	$conf->modules_parts['tpl'] = array();
+
 
 	if ($action !== 'editline'){
 		$productDefault->formAddObjectLine(1, $object, $object);
