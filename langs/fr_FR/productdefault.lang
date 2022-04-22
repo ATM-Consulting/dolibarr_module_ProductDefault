@@ -66,3 +66,9 @@ DELETE_SUCCESS=Suppression de la ligne
 Assignementmandatory=Vous devez sélectionner au moins un type de document
 ConcernedDocuments=Document(s) concerné(s)
 ReductionShort=Réduc.
+
+#
+# Permissions
+#
+ProductDefaultRightRead=Voir les produits par défaut des tiers
+ProductDefaultRightCreateUpdateDelete=Ajout / modifier / supprimer des produits par défaut pour les tiers

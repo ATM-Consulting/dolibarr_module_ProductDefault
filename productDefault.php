@@ -105,6 +105,8 @@ $usercanread = $user->rights->productdefault->lire;
 $usercancreate = $user->rights->productdefault->creer;
 $usercandelete = $user->rights->productdefault->supprimer;
 
+if (!$usercanread) accessforbidden();
+
 $object = new Societe($db);
 $object->fetch($id);
 
@@ -712,7 +714,7 @@ print '<table id="tablelines" class="noborder noshadow" width="100%">';
 
 
 
-	if ($action !== 'editline'){
+	if ($action !== 'editline' && $usercancreate){
 		$productDefault->formAddObjectLine(1, $object, $object);
 	}
 

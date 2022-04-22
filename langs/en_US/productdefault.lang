@@ -51,3 +51,9 @@ MyPageName = My page name
 #
 MyWidget = My widget
 MyWidgetDescription = My widget description
+
+#
+# Permissions
+#
+ProductDefaultRightRead=Read thirdparties default products
+ProductDefaultRightCreateUpdateDelete=Add / update / delete thirdparties default products

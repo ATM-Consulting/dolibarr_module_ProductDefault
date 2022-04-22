@@ -266,18 +266,18 @@ class modProductDefault extends DolibarrModules
 		// Add here entries to declare new permissions
 		/* BEGIN MODULEBUILDER PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = 'Read objects of ProductDefault'; // Permission label
+		$this->rights[$r][1] = $langs->trans('ProductDefaultRightRead'); // Permission label
 		$this->rights[$r][4] = 'lire';
 		//$this->rights[$r][5] = $langs->trans('read'); // In php code, permission will be checked by test if ($user->rights->productdefault->productthirdpartydefault->read)
 		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = 'Create/Update objects of ProductDefault'; // Permission label
+		$this->rights[$r][1] = $langs->trans('ProductDefaultRightCreateUpdateDelete');; // Permission label
 		$this->rights[$r][4] = 'creer';
 		//$this->rights[$r][5] = $langs->trans('write'); // In php code, permission will be checked by test if ($user->rights->productdefault->productthirdpartydefault->write)
-		$r++;
-		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
-		$this->rights[$r][1] = 'Delete objects of ProductDefault'; // Permission label
-		$this->rights[$r][4] = 'supprimer';
+//		$r++;
+//		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+//		$this->rights[$r][1] = 'Delete objects of ProductDefault'; // Permission label
+//		$this->rights[$r][4] = 'supprimer';
 		//$this->rights[$r][5] = $langs->trans('delete'); // In php code, permission will be checked by test if ($user->rights->productdefault->productthirdpartydefault->delete)
 
 		/** ***  */
