@@ -718,8 +718,18 @@ class ProductThirdpartyDefault extends CommonObject
 		// Clean parameters
 		$remise_percent = price2num($remise_percent);
 		$qty = price2num($qty);
-		$pu = price2num($pu);
-		$pu_ht_devise = price2num($pu_ht_devise);
+		$pu = (float) price2num($pu);
+
+		$pu_ht_devise = (float) price2num($pu_ht_devise);
+
+		/*if (empty($pu_ht_devise)) {
+			$pu_ht_devise = 0;
+		}
+		if (empty($pu)){
+			$pu = $pu_ht_devise;
+		}*/
+
+
 		if (!preg_match('/\((.*)\)/', $txtva)) {
 			$txtva = price2num($txtva); // $txtva can have format '5.0(XXX)' or '5'
 		}

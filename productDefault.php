@@ -498,6 +498,10 @@ elseif ($action == 'updateline' && $usercancreate){
 		$errors++;
 	}
 
+	if (empty(GETPOST('price_ht','int'))){
+		$pu_ht = 0;
+	}
+
 	if ($errors == 0){
 		// Update a line within proposal
 		// Define info_bits
